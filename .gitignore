@@ -1,0 +1,20 @@
+# secrets
+.env
+
+# environment
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# run outputs — published with the lift report, not before
+results/*/
+!results/.gitkeep
+
+# local canon backups (canon.yaml is the published one)
+canon.v1.yaml
+canon.approved.backup.yaml
+
+# pilot-era report, produced under the v1 taxonomy that was later found
+# mis-specified. Kept locally for the writeup; not shipped as a result.
+reports/baseline-pilot.md

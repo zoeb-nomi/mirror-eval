@@ -1,0 +1,88 @@
+# Claim-failure taxonomy — the primary result of this harness.
+#
+# Counts per category are the headline. Each category names a distinct fix, which
+# a composite score cannot. Modelled on the citation-failure taxonomy in
+# github.com/zoeb-nomi/crosssource.
+#
+# An answer carries zero or more tags. Zero tags = clean.
+
+categories:
+  - id: stale_role
+    definition: "Asserts a superseded job title or seniority band as current."
+    example_trigger: "'Senior Product Manager'"
+    fix_class: "surface"          # a live web page is teaching this
+
+  - id: stale_employer
+    definition: "Names a past employer as the subject's current employer."
+    example_trigger: "'currently at Keka', 'works at Multiplier'"
+    fix_class: "surface"
+
+  - id: stale_positioning
+    definition: "Describes a retired framing of what the subject does."
+    example_trigger: "'cultural technology', 'HR-tech generalist'"
+    fix_class: "surface"
+
+  - id: fabricated_metric
+    definition: >
+      States a number about the subject that does not appear in canon, as fact.
+      Wrong specifics are worse than vagueness — the reader cannot tell a
+      fabricated number from a real one.
+    fix_class: "model"            # no surface says this; the engine invented it
+
+  - id: unverifiable_specific
+    definition: "A specific factual claim canon can neither confirm nor deny."
+    fix_class: "canon"
+    reporting: coverage      # NOT an engine failure. This measures how complete OUR
+                             # ground truth is, so it is reported separately from the
+                             # failure table rather than inflating it.            # may indicate canon is incomplete, not that the engine erred
+
+  - id: conflated_identity
+    definition: "Mixes in a different person with the same or a similar name."
+    fix_class: "disambiguation"
+
+  - id: hallucinated_verification
+    definition: >
+      AFFIRMATIVELY confirms a specific claim while citing nothing that contains
+      it. The analog of CrossSource's `unsupported_claim`.
+      NOT this category: declining to confirm a claim it could not find. Refusing
+      to vouch for unfound evidence is correct epistemic behaviour, and the v1
+      definition wrongly punished it — see reports/baseline-pilot.md.
+    fix_class: "model"
+
+  - id: missed_available_evidence
+    definition: >
+      States that no evidence exists for a claim that IS publicly documented on a
+      surface listed in canon.clean_sources. Not a hallucination — a retrieval
+      failure. The engine was honest; the evidence was simply unfindable.
+    fix_class: "surface"
+
+  - id: substituted_source
+    definition: >
+      Cites a source that is not about the subject as though it were, and builds
+      claims on it — job listings that merely contain the subject's job title,
+      generic articles about the subject's field, name-etymology or people-search
+      pages. The characteristic failure when nothing authoritative is findable:
+      the engine does not abstain, it fills.
+    fix_class: "surface"
+
+  - id: poisoned_citation
+    definition: "Cites a surface listed in canon.poisoned_sources."
+    fix_class: "surface"
+    computed: true           # decided in code by matching the citation list against
+                             # canon.poisoned_sources. Asking a language model to do
+                             # string matching is asking it to do arithmetic badly.
+
+  - id: no_sources
+    definition: "Search mode, search actually fired, but the answer cites nothing."
+    fix_class: "surface"
+    computed: true           # countable. The Gemini judge fired this 0 times out of
+                             # 28 in wave 1 — not a different opinion, a category it
+                             # never engaged with.          # usually means nothing crawlable exists to cite
+
+  - id: refused_to_assess
+    definition: "Declined to give a judgement the prompt explicitly asked for."
+    fix_class: "model"       # Model policy about assessing private individuals — no
+                             # amount of web-surface work changes this one.
+
+# Secondary rollup. Reported, but the taxonomy carries the argument.
+score_dimensions: [identity, accuracy, endorsement, sources]

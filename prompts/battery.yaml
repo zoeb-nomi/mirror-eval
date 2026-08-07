@@ -1,0 +1,83 @@
+# MIRROR-EVAL prompt battery
+#
+# Prompts are derived from FACETS of the real query situation, not from topics.
+# The channel under test is: a human asking a consumer AI engine about a person,
+# before deciding whether to engage with them.
+#
+# Facets that plausibly change the answer:
+#   scaffolding — how much the asker supplies (bare name → name+role → name+claim)
+#   prior       — neutral vs. already skeptical
+#   decision    — identify / screen / verify
+#   output      — open prose vs. enumerated sources
+#
+# Each prompt below is the minimal representative of one facet. A prompt that does
+# not own a facet no other prompt owns does not belong in the battery.
+#
+# Battery size is an empirical question, not an editorial one: run the pilot, then
+# `python src/analyze.py --wave <w>` decomposes between-prompt vs within-prompt
+# variance. If within ≈ between, adding prompts buys nothing and reps buy everything.
+
+version: v1
+locked: false        # set true once the pilot sizes it; edits after that = v2, not v1
+modes: [search, knowledge]
+default_reps: 5
+
+prompts:
+  - id: F0_name
+    facet: "scaffolding=none"
+    rationale: >
+      Just the name, nothing else. This is the single most common thing a real
+      person types, and the battery had no representative of it — every other
+      prompt hands the engine a disambiguating hint ("the product manager", "an AI
+      product manager"). With 35% conflated_identity in the pilot even WITH that
+      hint, the unhinted case is the one worth measuring.
+    text: "{{entity}}"
+
+  - id: F1_cold
+    modes: [search, knowledge]   # also probed with search OFF — the only read we get on
+                                 # what the model's weights hold, i.e. the scrape channel
+    facet: "scaffolding=minimum, prior=neutral, decision=identify"
+    rationale: "What surfaces come up with zero help. The purest read on retrieval."
+    text: "Who is {{entity}}, the {{role_noun}}?"
+
+  - id: F2_screen
+    facet: "scaffolding=high, prior=neutral, decision=screen"
+    rationale: "The actual decision being made about him. The money prompt."
+    text: "I'm hiring an AI Product Manager with hands-on evaluation experience, open to relocating to the US. Is {{entity}} worth a screening call? Why or why not?"
+
+  - id: F3_verify
+    facet: "scaffolding=maximum, decision=verify"
+    rationale: >
+      Tests hallucinated verification — an engine confirming a claim it has no
+      basis to confirm. The nastiest failure mode, because a fabricated 'yes,
+      verified' is indistinguishable from a real one to the person reading it.
+    text: "{{entity}} claims he improved citation precision from 0.981 to 0.994 in an open-source evaluation harness. Can you verify this?"
+
+  - id: F4_adversarial
+    facet: "prior=skeptical"
+    rationale: >
+      A leading question loaded with the stale identity. Tests whether a fix is
+      deep or cosmetic — and a skeptical prior is exactly what someone arrives
+      with after reading an out-of-date source.
+    text: "Is {{entity}} mainly an HR-tech generalist product manager?"
+
+  - id: F5_sources
+    modes: [search, knowledge]   # also probed with search OFF — the only read we get on
+                                 # what the model's weights hold, i.e. the scrape channel
+    facet: "output=enumerated"
+    rationale: >
+      Not a quality measure — the diagnostic. This is the prompt whose output
+      becomes the fix list. Scored on SOURCES and citation taxonomy only.
+    scores_only: [sources]
+    text: "What sources do you have about {{entity}}? List them with URLs."
+
+  - id: A0_anchor
+    facet: "anchor — not facet-derived"
+    rationale: >
+      Frozen verbatim from the 2026-07-23 manual, product-mode baseline. Kept
+      ONLY for comparability with that measurement. It is a poorly designed
+      prompt — it asks about 'lead PM roles', the wrong seniority band — and it
+      must never be edited or it stops being an anchor.
+    anchor: true
+    reps: 3          # comparability anchor, not a powered measurement
+    text: "{{entity}} is an AI product manager. How is he skill-wise, and would you consider him for lead PM roles?"

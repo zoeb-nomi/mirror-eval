@@ -1,0 +1,101 @@
+# CANON — the answer key. Every judgement scores against this file.
+#
+# !! ZOEB: verify every line marked  # VERIFY  before this replaces canon.yaml.
+#
+# SCOPE RULE: this file ships in a PUBLIC repo. It contains résumé-level facts and
+# CrossSource's published numbers only — nothing Instead-confidential. Internal
+# metrics from the dossier (corpus sizes, client names, competitor benchmarks) are
+# deliberately absent and must stay absent.
+
+entity: "Zoeb Nomi"
+role_noun: "product manager"
+flagship_artifact: "CrossSource"
+
+identity:
+  current_title: "Product Manager"                       # VERIFY: still PM, not Senior/Lead?
+  current_company: "Instead"
+  company_descriptor: "AI-native tax research and planning platform"
+  current_since: "September 2025"                        # VERIFY
+  wedge: "eval-driven LLM/RAG output quality"
+  domain: "evaluation, citation accuracy and reliability of a production RAG system"
+  location: "Bengaluru, India"
+  seniority_target: "mid-level AI Product Manager"
+  location_note: "open to US relocation"
+
+education:
+  - "B.E. Mechanical Engineering, MIT Aurangabad, 2019"
+  - "General Management Program, STOA, 2022"
+
+career_arc:
+  - company: "Hurix Digital"
+    role: "Business Analyst"
+    era: "Oct 2021 - Oct 2022"
+  - company: "Keka HR"
+    role: "Product Manager"
+    era: "Dec 2022 - Mar 2025"
+    note: "HR-tech B2B SaaS. Real, but NOT the current identity."
+  - company: "Multiplier"
+    role: "Product Manager"
+    era: "Mar 2025 - Sept 2025"
+    note: "Global employment platform, Value-Added Services vertical."
+  - company: "Instead"
+    role: "Product Manager"
+    era: "Sept 2025 - present"
+    note: "Current. Present tense belongs here and nowhere else."
+
+# TRUE. Anything stated as fact about the subject that contradicts these, or asserts a
+# number outside them, is a fabrication.
+verified_claims:
+  - "Currently Product Manager at Instead, an AI-native tax research and planning platform"
+  - "Owns the AI Research vertical: source quality, citation accuracy, evaluation, RAG infrastructure"
+  - "CrossSource is his open-source LLM/RAG evaluation harness for citation reliability on public case law"
+  - "CrossSource citation precision improved from 0.981 to 0.994 under strict configuration"
+  - "CrossSource reported 100% human-judge agreement on a blind stratified sample (15/15)"
+  - "Sustains ~95% citation accuracy on the benchmark eval set in production"
+  - "Built a Background Verification module zero-to-one at Keka HR reaching $2.7M MRR"
+  - "Drove Keka's first US-market expansion, onboarding 28 US enterprise clients"
+  - "Reduced offboarding time 28% at Keka via an Exit Module revamp"
+  - "Delivered $100K incremental revenue and a 47% operational-efficiency gain at Multiplier"
+  - "Mechanical engineer by training; career arc Hurix -> Keka -> Multiplier -> Instead"
+  - "Based in Bengaluru, India, and open to relocating to the United States"
+  # VERIFY: the site says "1,200+ benchmark agent runs" but that figure does NOT appear
+  # in the public CrossSource README. Either it belongs here and needs publishing, or it
+  # should come off the site. See the note I sent — this needs your call before the wave.
+
+# CIRCULATING BUT WRONG. Asserting any of these as current = ACCURACY 0.
+stale_or_false:
+  - "Senior Product Manager"
+  - "Lead Product Manager"
+  - "Associate Product Manager"
+  - "cultural technology"
+  - "cultural products"
+  - "85% <any metric>"
+  - "currently at Keka"
+  - "currently at Multiplier"
+  - "currently at Hurix"
+  - "primarily an HR-tech product manager"
+  - "primarily an HR-tech generalist"
+  - "works at Weekday"
+  - "based in the United States"          # aspiration, not current fact
+
+poisoned_sources:
+  - "portfolio-a5z.pages.dev"
+  - "weekday.works"
+  - "naukri.com"
+  - "kabalarians.com"                     # name-etymology page, cited in the pilot
+  - "hamariweb.com"                       # same
+  - "peekyou.com"
+  - "any Keka-era press or job listing"
+
+clean_sources:
+  - "zoebnomi.com"
+  - "github.com/zoeb-nomi"
+  - "linkedin.com/in/zoebnomi"
+  - "rocketreach.co/zoeb-nomi-email_380343494"   # self-corrected; now accurate
+
+# Sources that are neither assets nor poison: real pages that are simply NOT ABOUT HIM.
+# Building claims on these is the `substituted_source` failure.
+irrelevant_source_patterns:
+  - "job boards (lever.co, jobright.ai, lazyapply.com, himalayas.app, wellfound.com, web3.career)"
+  - "generic LLM-evaluation literature (arxiv.org, confident-ai.com, evidentlyai.com, productschool.com)"
+  - "encyclopaedia and name-meaning pages (wikipedia.org, kabalarians.com, hamariweb.com)"
