@@ -90,6 +90,52 @@ def main() -> int:
 
     outdir = ROOT / "results" / a.wave
     outdir.mkdir(parents=True, exist_ok=True)
+
+    # ---- comparability manifest ------------------------------------------------
+    # Written at run start so wave-to-wave comparability is a file diff, not an
+    # argument. If the battery is locked and its hash differs from the baseline
+    # manifest's, refuse to run: that would be a v2 battery wearing a v1 label.
+    import hashlib
+    import subprocess
+
+    def _sha(path: pathlib.Path) -> str:
+        return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else ""
+
+    frozen = ["canon.yaml", "taxonomy.yaml", "rubric.md", "prompts/battery.yaml",
+              "src/engines.py", "src/judge.py"]
+    manifest = {
+        "wave": a.wave,
+        "reps": reps,
+        "engines": engines,
+        "battery_version": battery["version"],
+        "battery_locked": bool(battery.get("locked")),
+        "sha256": {f: _sha(ROOT / f) for f in frozen},
+    }
+    try:
+        manifest["git_commit"] = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
+            text=True, timeout=5).stdout.strip()
+        manifest["git_dirty"] = bool(subprocess.run(
+            ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True,
+            text=True, timeout=5).stdout.strip())
+    except Exception:                                         # noqa: BLE001
+        manifest["git_commit"], manifest["git_dirty"] = "", None
+
+    if battery.get("locked"):
+        for base in sorted(d for d in (ROOT / "results").iterdir() if d.is_dir()):
+            bm = base / "manifest.json"
+            if bm.exists() and base.name != a.wave:
+                baseline = json.loads(bm.read_text())
+                b_sha = baseline.get("sha256", {}).get("prompts/battery.yaml")
+                if b_sha and b_sha != manifest["sha256"]["prompts/battery.yaml"]:
+                    print(f"REFUSING to run: prompts/battery.yaml is locked but its hash "
+                          f"differs from baseline wave {base.name!r}.\n"
+                          f"Either revert the battery, or bump version to v2 and set "
+                          f"locked: false consciously.", file=sys.stderr)
+                    return 1
+    (outdir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    # ---------------------------------------------------------------------------
+
     raw = outdir / "raw_results.jsonl"
     seen = done_keys(raw) if a.resume else set()
     if not a.resume and raw.exists():

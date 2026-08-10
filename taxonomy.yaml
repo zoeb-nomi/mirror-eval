@@ -34,7 +34,7 @@ categories:
     fix_class: "canon"
     reporting: coverage      # NOT an engine failure. This measures how complete OUR
                              # ground truth is, so it is reported separately from the
-                             # failure table rather than inflating it.            # may indicate canon is incomplete, not that the engine erred
+                             # failure table rather than inflating it.
 
   - id: conflated_identity
     definition: "Mixes in a different person with the same or a similar name."
@@ -77,7 +77,7 @@ categories:
     fix_class: "surface"
     computed: true           # countable. The Gemini judge fired this 0 times out of
                              # 28 in wave 1 — not a different opinion, a category it
-                             # never engaged with.          # usually means nothing crawlable exists to cite
+                             # never engaged with.
 
   - id: refused_to_assess
     definition: "Declined to give a judgement the prompt explicitly asked for."

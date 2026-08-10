@@ -18,9 +18,11 @@
 # variance. If within ≈ between, adding prompts buys nothing and reps buy everything.
 
 version: v1
-locked: false        # set true once the pilot sizes it; edits after that = v2, not v1
+locked: true         # LOCKED 2026-08-09 against baseline wave 2026-08-06. Any prompt
+                     # edit = version v2 and forfeits comparability with the baseline.
 modes: [search, knowledge]
-default_reps: 5
+default_reps: 10     # what the baseline wave ran (via --reps 10); frozen so a
+                     # bare `run_eval.py --wave X` cannot silently halve wave 2
 
 prompts:
   - id: F0_name

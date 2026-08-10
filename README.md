@@ -158,7 +158,13 @@ reports/              baseline-<wave>.md · lift-<wave>.md
   prompt, and its own retrieval; the API does not. A small manual product-mode spot-check
   runs alongside each wave and the gap is reported as a number rather than a caveat.
 - **The judges and two of the systems under test share model families.** Cross-family
-  agreement and blind human labelling are the mitigations, not a cure.
+  agreement and blind human labelling are the mitigations, not a cure. Worse, in wave 1
+  the Gemini judge and the Gemini engine under test were the **same model string**
+  (`gemini-flash-latest`) — the exact conflict the two-family design exists to avoid,
+  discovered after the wave ran. It is disclosed rather than fixed because swapping the
+  judge between waves would forfeit wave-to-wave comparability; judge models are now
+  recorded per row (`judge_model`) and pinned via `ME_PIN_JUDGE_*` so this cannot
+  happen silently again.
 - **Small n.** Treat deltas below the resolution reported by `analyze.py` as directional,
   not significant.
 - **One channel of three.** See the scope table above. Recruiter-database enrichment is

@@ -58,37 +58,78 @@ def do_export(wave: str, n_clean: int, max_items: int) -> int:
     grouped = by_probe(scores)
     tax = yaml.safe_load((ROOT / "taxonomy.yaml").read_text())
 
+    # Stratum priority: HIGH-IMPACT FIRST. The v1 code put the disagreement branch
+    # first, so any high-impact item the judges disagreed on fell into `disagree` —
+    # and at 83% disagreement the high-impact stratum came out EMPTY, while rubric.md
+    # promised "every answer carrying a high-impact tag". An item can matter for two
+    # reasons; it gets sampled for the more important one.
     disagree, high, clean = [], [], []
     for k, js in grouped.items():
         sets = [frozenset(v["tag_ids"]) for v in js.values()]
         union = set().union(*sets) if sets else set()
-        if len(set(sets)) > 1:
-            disagree.append(k)
-        elif union & HIGH_IMPACT:
+        if union & HIGH_IMPACT:
             high.append(k)
+        elif len(set(sets)) > 1:
+            disagree.append(k)
         elif not union:
             clean.append(k)
 
     rng = random.Random(SEED)
-    # balance the clean sample across engines so per-engine bias stays visible
-    per_engine = collections.defaultdict(list)
-    for k in clean:
-        per_engine[k[0]].append(k)
-    picked_clean = []
-    if per_engine:
-        quota = max(1, n_clean // len(per_engine))
-        for eng in sorted(per_engine):
-            pool = sorted(per_engine[eng])
-            rng.shuffle(pool)
-            picked_clean += pool[:quota]
 
-    rng.shuffle(disagree)
-    rng.shuffle(high)
-    budget = max_items - len(picked_clean)
-    take_high = high[:max(0, budget // 3)]
-    take_dis = disagree[:max(0, budget - len(take_high))]
+    def engine_balanced(pool: list, want: int) -> list:
+        """Round-robin across engines, redistributing when an engine's pool runs
+        dry — the v1 fixed quota gave Gemini 1 clean control and silently returned
+        10 items instead of 12."""
+        by_eng = collections.defaultdict(list)
+        for k in sorted(pool):
+            by_eng[k[0]].append(k)
+        for eng in by_eng:
+            rng.shuffle(by_eng[eng])
+        picked, engines = [], sorted(by_eng)
+        while len(picked) < want and any(by_eng[e] for e in engines):
+            for eng in engines:
+                if by_eng[eng] and len(picked) < want:
+                    picked.append(by_eng[eng].pop())
+        return picked
+
+    picked_clean = engine_balanced(clean, n_clean)
+
+    budget = max(0, max_items - len(picked_clean))
+    # High-impact gets half the budget (engine-balanced), disagreements the rest.
+    take_high = engine_balanced(high, min(len(high), max(1, budget // 2)) if high else 0)
+    take_dis = engine_balanced(disagree, max(0, budget - len(take_high)))
+
+    # Prompt floor: every prompt id present in the eligible pools should appear at
+    # least PROMPT_FLOOR times in the sample. F3_verify — the prompt built to elicit
+    # hallucinated_verification — drew 1 item in 40 under v1 sampling.
+    PROMPT_FLOOR = 3
+    sample_set = set(take_high + take_dis)
+    eligible = high + disagree
+    per_prompt_avail = collections.defaultdict(list)
+    for k in eligible:
+        per_prompt_avail[k[1]].append(k)
+    for pid, avail in sorted(per_prompt_avail.items()):
+        have = [k for k in sample_set if k[1] == pid]
+        need = min(PROMPT_FLOOR, len(avail)) - len(have)
+        if need <= 0:
+            continue
+        candidates = sorted(set(avail) - sample_set)
+        rng.shuffle(candidates)
+        for cand in candidates[:need]:
+            # swap out an item from the most over-represented prompt
+            counts = collections.Counter(k[1] for k in sample_set)
+            fat = max(counts, key=lambda x: counts[x])
+            if counts[fat] <= PROMPT_FLOOR:
+                sample_set.add(cand)          # grow past cap rather than starve a prompt
+                continue
+            victim = next(k for k in sorted(sample_set) if k[1] == fat)
+            sample_set.discard(victim)
+            sample_set.add(cand)
+    take_high = [k for k in sample_set if k in set(high)]
+    take_dis = [k for k in sample_set if k in set(disagree)]
+
     dropped = (len(disagree) - len(take_dis)) + (len(high) - len(take_high))
-    sample = sorted(set(take_dis + take_high + picked_clean))
+    sample = sorted(sample_set | set(picked_clean))
     items = []
     for k in sample:
         r = raw[k]
@@ -122,6 +163,10 @@ def do_export(wave: str, n_clean: int, max_items: int) -> int:
     print(f"  {len(take_dis)}/{len(disagree)} judge-disagreement · "
           f"{len(take_high)}/{len(high)} high-impact · {len(picked_clean)} clean control"
           f"  = {len(items)} to label")
+    mix = collections.Counter(i["id"].split("|")[1] for i in items)
+    print("  prompt mix: " + " · ".join(f"{k}:{v}" for k, v in sorted(mix.items())))
+    mix_e = collections.Counter(i["id"].split("|")[0] for i in items)
+    print("  engine mix: " + " · ".join(f"{k}:{v}" for k, v in sorted(mix_e.items())))
     if dropped:
         print(f"  !! {dropped} eligible items were NOT sampled (cap --max {max_items}). "
               f"Report the cap in limitations; a silently truncated sample reads as full coverage.")

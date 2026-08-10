@@ -283,8 +283,9 @@ def main() -> int:
 
     def one(job):
         jname, rec = job
+        jmeta: dict = {}
         try:
-            v = parse(JUDGES[jname](system, build_user(rec)))
+            v = parse(JUDGES[jname](system, build_user(rec), out_meta=jmeta))
         except Exception as e:                                  # noqa: BLE001
             with lock:
                 print(f"  ERR {jname} {rec['engine']}/{rec['prompt_id']}: {type(e).__name__}: {str(e)[:110]}")
@@ -292,6 +293,10 @@ def main() -> int:
         tags = normalise_tags(v, valid)
         try:
             row = _row(jname, rec, v, valid, canon, computed_ids)
+            # Which model ACTUALLY judged this row. Wave 1's judge models are
+            # unrecoverable from its results; never again.
+            row["judge_model"] = jmeta.get("model_resolved") or jmeta.get("model_requested") or ""
+
         except Exception as e:                                  # noqa: BLE001
             with lock:
                 print(f"  ERR {jname} {rec['engine']}/{rec['prompt_id']} (post-parse): "

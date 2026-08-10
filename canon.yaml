@@ -1,5 +1,8 @@
 # CANON — the answer key. Every judgement scores against this file.
 #
+# SIGNED OFF 2026-08-10: Zoeb verified all 12 true_claims + identity block against
+# resume v3 (inline review). Canon is no longer provisional.
+#
 # !! ZOEB: verify every line marked  # VERIFY  before this replaces canon.yaml.
 #
 # SCOPE RULE: this file ships in a PUBLIC repo. It contains résumé-level facts and
@@ -58,9 +61,10 @@ verified_claims:
   - "Delivered $100K incremental revenue and a 47% operational-efficiency gain at Multiplier"
   - "Mechanical engineer by training; career arc Hurix -> Keka -> Multiplier -> Instead"
   - "Based in Bengaluru, India, and open to relocating to the United States"
-  # VERIFY: the site says "1,200+ benchmark agent runs" but that figure does NOT appear
-  # in the public CrossSource README. Either it belongs here and needs publishing, or it
-  # should come off the site. See the note I sent — this needs your call before the wave.
+  # RESOLVED 2026-08-09 (Zoeb's ruling): "1,200+ benchmark agent runs" stays DO-NOT-SHIP
+  # until CrossSource v0.2 publishes the runs. Public surfaces (GitHub profile README,
+  # commit 6e9a7f3) now carry the generalized form only. Same ruling applied to the
+  # 270K+ corpus figure. Specific numbers return to canon when v0.2 makes them verifiable.
 
 # CIRCULATING BUT WRONG. Asserting any of these as current = ACCURACY 0.
 stale_or_false:

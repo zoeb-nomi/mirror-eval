@@ -105,6 +105,8 @@ class Probe:
     prompt_id: str
     question: str
     answer: str = ""
+    model_resolved: str = ""   # what the provider ACTUALLY served. Aliases repoint
+                               # silently; this field is how a repoint gets caught.
     citations: list[dict] = field(default_factory=list)   # [{"url": ..., "title": ...}]
     search_performed: bool = False       # did the engine ACTUALLY search, not just get offered the tool
     usage: dict = field(default_factory=dict)
@@ -145,6 +147,7 @@ def probe_openai(question: str, mode: Mode, model: str | None = None) -> Probe:
         )
         r.raise_for_status()
         d = r.json()
+        p.model_resolved = d.get("model", "")
         texts, cites = [], []
         for item in d.get("output", []):
             if item.get("type") == "web_search_call":
@@ -189,6 +192,7 @@ def probe_anthropic(question: str, mode: Mode, model: str | None = None) -> Prob
         )
         r.raise_for_status()
         d = r.json()
+        p.model_resolved = d.get("model", "")
         texts, cites = [], []
         for block in d.get("content", []):
             if block.get("type") == "web_search_tool_result":
@@ -231,6 +235,7 @@ def probe_perplexity(question: str, mode: Mode, model: str | None = None) -> Pro
         )
         r.raise_for_status()
         d = r.json()
+        p.model_resolved = d.get("model", "")
         p.answer = (d.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
         results = d.get("search_results") or []
         if results:
@@ -296,6 +301,7 @@ def probe_gemini(question: str, mode: Mode, model: str | None = None) -> Probe:
             json=body, timeout=TIMEOUT,
         )
         d = r.json()
+        p.model_resolved = d.get("modelVersion", "")
         cand = (d.get("candidates") or [{}])[0]
         p.answer = "\n".join(part.get("text", "")
                              for part in cand.get("content", {}).get("parts", [])
@@ -334,7 +340,8 @@ def available_engines() -> list[str]:
 # than assumed. Claude judging Claude — one of the four systems under test — is a
 # real conflict of interest, not a footnote.
 
-def judge_anthropic(system: str, user: str, model: str | None = None) -> str:
+def judge_anthropic(system: str, user: str, model: str | None = None,
+                    out_meta: dict | None = None) -> str:
     model = model or os.environ.get("ME_JUDGE_ANTHROPIC", "claude-haiku-4-5")
     r = _post(
         "https://api.anthropic.com/v1/messages",
@@ -350,6 +357,9 @@ def judge_anthropic(system: str, user: str, model: str | None = None) -> str:
         timeout=TIMEOUT,
     )
     d = r.json()
+    if out_meta is not None:
+        out_meta["model_requested"] = model
+        out_meta["model_resolved"] = d.get("model", "")
     out = "".join(b.get("text", "") for b in d.get("content", [])
                   if b.get("type") == "text")
     if not out.strip():
@@ -369,7 +379,8 @@ def judge_anthropic(system: str, user: str, model: str | None = None) -> str:
     return out
 
 
-def judge_gemini(system: str, user: str, model: str | None = None) -> str:
+def judge_gemini(system: str, user: str, model: str | None = None,
+                 out_meta: dict | None = None) -> str:
     """generateContent (no grounding) — the judge must not search, only reason over canon."""
     model = model or os.environ.get("ME_JUDGE_GEMINI", "gemini-flash-latest")
     r = _post(
@@ -382,6 +393,9 @@ def judge_gemini(system: str, user: str, model: str | None = None) -> str:
     )
     r.raise_for_status()
     d = r.json()
+    if out_meta is not None:
+        out_meta["model_requested"] = model
+        out_meta["model_resolved"] = d.get("modelVersion", "")
     return "".join(p.get("text", "") for p in
                    d.get("candidates", [{}])[0].get("content", {}).get("parts", []))
 
@@ -412,16 +426,36 @@ def preflight() -> int:
             status = "ok  " if not p.error else "FAIL"
             if p.error:
                 ok = False
+            res = p.model_resolved or "?"
+            pin = os.environ.get(f"ME_PIN_{name.upper()}")
+            drift = bool(pin and p.model_resolved and p.model_resolved != pin)
+            if drift:
+                ok = False
+                status = "FAIL"
             print(f"  {status}  {name:<11} {mode:<9} model={str(p.model or '?'):<22}"
-                  f" {p.latency_s:>5.1f}s" + (f"  {p.error[:300]}" if p.error else ""))
+                  f" -> {res:<26} {p.latency_s:>5.1f}s"
+                  + (f"  {p.error[:300]}" if p.error else ""))
+            if drift:
+                print(f"        PIN MISMATCH: provider now serves {res!r}, pinned "
+                      f"{pin!r}. The alias repointed — wave comparability is broken. "
+                      f"Do not run a wave until this is resolved.")
     print("judges")
     for name in JUDGES:
         if not os.environ.get(JUDGE_KEYS[name]):
             print(f"  skip  {name} ({JUDGE_KEYS[name]} not set)")
             continue
         try:
-            out = JUDGES[name]("Reply with JSON only.", 'Return {"ok":true}')
-            print(f"  ok    {name:<11} -> {out.strip()[:60]}")
+            meta: dict = {}
+            out = JUDGES[name]("Reply with JSON only.", 'Return {"ok":true}',
+                               out_meta=meta)
+            res = meta.get("model_resolved") or "?"
+            pin = os.environ.get(f"ME_PIN_JUDGE_{name.upper()}")
+            if pin and meta.get("model_resolved") and meta["model_resolved"] != pin:
+                ok = False
+                print(f"  FAIL  {name:<11} PIN MISMATCH: provider now serves "
+                      f"{res!r}, pinned {pin!r}")
+            else:
+                print(f"  ok    {name:<11} serves {res:<26} -> {out.strip()[:40]}")
         except Exception as e:                                # noqa: BLE001
             ok = False
             print(f"  FAIL  {name:<11} {type(e).__name__}: {str(e)[:110]}")
