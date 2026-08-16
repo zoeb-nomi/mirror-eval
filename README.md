@@ -1,4 +1,5 @@
 # mirror-eval
+By **[Zoeb Nomi](https://zoebnomi.com/?utm_source=github&utm_medium=readme&utm_campaign=mirror-eval)** — AI Product Manager (LLM/RAG output quality & evaluation). Companion project: [CrossSource](https://github.com/zoeb-nomi/crosssource).
 
 **An evaluation harness for what AI search engines say about a person — and whether you can change it.**
 
