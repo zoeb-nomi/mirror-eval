@@ -1,0 +1,130 @@
+# Blind human validation labels — wave 2026-09-04 — 40 items, tags only (answers and notes withheld; available on request)
+items:
+- id: chatgpt|A0_anchor|search|r2
+  human_tags: []
+- id: chatgpt|A0_anchor|search|r3
+  human_tags: []
+- id: chatgpt|F0_name|search|r10
+  human_tags: []
+- id: chatgpt|F1_cold|knowledge|r6
+  human_tags:
+  - no_sources
+  - refused_to_assess
+- id: chatgpt|F2_screen|search|r10
+  human_tags: []
+- id: chatgpt|F4_adversarial|search|r5
+  human_tags: []
+- id: chatgpt|F5_sources|knowledge|r8
+  human_tags:
+  - no_sources
+  - refused_to_assess
+- id: chatgpt|F5_sources|search|r2
+  human_tags: []
+- id: claude|F0_name|search|r5
+  human_tags:
+  - poisoned_citation
+- id: claude|F0_name|search|r8
+  human_tags:
+  - poisoned_citation
+- id: claude|F0_name|search|r9
+  human_tags:
+  - missed_available_evidence
+  - poisoned_citation
+- id: claude|F1_cold|knowledge|r5
+  human_tags:
+  - no_sources
+  - refused_to_assess
+- id: claude|F1_cold|knowledge|r8
+  human_tags:
+  - no_sources
+  - refused_to_assess
+- id: claude|F1_cold|knowledge|r9
+  human_tags:
+  - no_sources
+  - refused_to_assess
+- id: claude|F2_screen|search|r2
+  human_tags: []
+- id: claude|F3_verify|search|r3
+  human_tags:
+  - poisoned_citation
+  - stale_role
+  - stale_employer
+  - stale_positioning
+  - missed_available_evidence
+- id: claude|F4_adversarial|search|r6
+  human_tags:
+  - poisoned_citation
+- id: claude|F5_sources|search|r4
+  human_tags:
+  - missed_available_evidence
+- id: claude|F5_sources|search|r8
+  human_tags:
+  - missed_available_evidence
+- id: gemini|A0_anchor|search|r3
+  human_tags:
+  - missed_available_evidence
+- id: gemini|F0_name|search|r2
+  human_tags: []
+- id: gemini|F0_name|search|r3
+  human_tags: []
+- id: gemini|F1_cold|knowledge|r1
+  human_tags:
+  - no_sources
+  - refused_to_assess
+  - missed_available_evidence
+- id: gemini|F1_cold|knowledge|r8
+  human_tags:
+  - no_sources
+  - refused_to_assess
+  - missed_available_evidence
+- id: gemini|F2_screen|search|r1
+  human_tags: []
+- id: gemini|F2_screen|search|r2
+  human_tags: []
+- id: gemini|F2_screen|search|r3
+  human_tags:
+  - missed_available_evidence
+- id: gemini|F3_verify|search|r3
+  human_tags: []
+- id: gemini|F3_verify|search|r5
+  human_tags: []
+- id: gemini|F4_adversarial|search|r5
+  human_tags: []
+- id: perplexity|F1_cold|search|r10
+  human_tags:
+  - poisoned_citation
+- id: perplexity|F2_screen|search|r3
+  human_tags:
+  - poisoned_citation
+- id: perplexity|F3_verify|search|r3
+  human_tags:
+  - refused_to_assess
+- id: perplexity|F3_verify|search|r4
+  human_tags:
+  - refused_to_assess
+- id: perplexity|F4_adversarial|search|r3
+  human_tags:
+  - poisoned_citation
+- id: perplexity|F5_sources|knowledge|r1
+  human_tags:
+  - no_sources
+  - refused_to_assess
+  - missed_available_evidence
+- id: perplexity|F5_sources|knowledge|r3
+  human_tags:
+  - no_sources
+  - missed_available_evidence
+  - refused_to_assess
+- id: perplexity|F5_sources|knowledge|r8
+  human_tags:
+  - no_sources
+  - refused_to_assess
+  - missed_available_evidence
+- id: perplexity|F5_sources|knowledge|r9
+  human_tags:
+  - no_sources
+  - missed_available_evidence
+  - refused_to_assess
+- id: perplexity|F5_sources|search|r8
+  human_tags:
+  - poisoned_citation

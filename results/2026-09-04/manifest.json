@@ -1,0 +1,22 @@
+{
+  "wave": "2026-09-04",
+  "reps": 10,
+  "engines": [
+    "chatgpt",
+    "claude",
+    "perplexity",
+    "gemini"
+  ],
+  "battery_version": "v1",
+  "battery_locked": true,
+  "sha256": {
+    "canon.yaml": "30a2539d375b285b454303964a1ccdeddd5e57c9ad9e9338c79c3b656177a6ab",
+    "taxonomy.yaml": "4c70e142798a582de1fcf4422b2b9b1f6dec6065fcef2e0a37b28997c1385f62",
+    "rubric.md": "e0345839d7fc0f962fbfab4f8b89e9a60aae82f7623c1a7c65f75eb359fa3f77",
+    "prompts/battery.yaml": "c3de3243073c177725b8db89b5fa4d2f964c687d7a4ee75103b7cc87c296059d",
+    "src/engines.py": "554288ce45f2b2a4ac23cb48b1f000a03620cc796daf3e4f5a24bb7ee6425b4f",
+    "src/judge.py": "942844689af0d1f096cdae7202b7c0e3470c8cf7469bc365a16d39c819c6a6c3"
+  },
+  "git_commit": "e9a1b4dd3df5d27bb0cd492a890e09978803d6ad",
+  "git_dirty": true
+}
