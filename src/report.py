@@ -53,6 +53,20 @@ def load(wave: str):
     return rows, raws
 
 
+def judged_probes(raws) -> list[dict]:
+    """Unique judged probes: rows with no error and a non-empty answer,
+    deduplicated on (engine, prompt_id, mode, rep). raw_results.jsonl can
+    contain retried error rows alongside the successful retry — this counts
+    only the probes that actually produced a judged answer."""
+    seen = {}
+    for r in raws:
+        if r.get("error") or not r.get("answer"):
+            continue
+        key = (r.get("engine"), r.get("prompt_id"), r.get("mode"), r.get("rep"))
+        seen[key] = r
+    return list(seen.values())
+
+
 def composite(r):
     v = [r.get(d) for d in DIMS if isinstance(r.get(d), (int, float))]
     return statistics.mean(v) if v else None
@@ -475,7 +489,7 @@ def main() -> int:
 
     title = "Lift report" if a.baseline else "Baseline report"
     doc = [f"# MIRROR-EVAL — {title} (`{a.wave}`)", "",
-           f"{len(raws)} probes · {len(rows)} judgements · {len(engines)} engines · "
+           f"{len(judged_probes(raws))} probes · {len(rows)} judgements · {len(engines)} engines · "
            f"{len({r['prompt_id'] for r in rows})} prompts · "
            f"{max((r['rep'] for r in raws), default=1)} reps per cell · "
            f"{len(judges)} judge(s)", "",
