@@ -18,3 +18,11 @@ canon.approved.backup.yaml
 # pilot-era report, produced under the v1 taxonomy that was later found
 # mis-specified. Kept locally for the writeup; not shipped as a result.
 reports/baseline-pilot.md
+
+# stray labelling drafts — local only
+/human_check.yaml
+Mirror Eval Labeler/
+# publish only aggregated / tag-level results
+!results/*/scores.jsonl
+!results/*/manifest.json
+!results/*/human_labels.yaml

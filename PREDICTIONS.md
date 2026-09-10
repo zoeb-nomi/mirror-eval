@@ -69,3 +69,21 @@ After the baseline wave, add HIT / MISS / PARTIAL to the outcome column with the
 number beside it. P11 is scored after wave 2. The README's results section must state the
 overall hit rate, and the report must discuss at least one miss in detail — a
 pre-registration nobody scores is decoration.
+
+## Scored against Wave 2 (2026-09-04)
+
+| # | Prediction | Verdict | Actual |
+|---|---|---|---|
+| P1 | Site <25% of citations at baseline | MISS | 136/252 search probes (54%) already cited it |
+| P2 | Absence > staleness | NOT TESTABLE | no_sources not broken out; staleness bands 6–39% |
+| P3 | Claude: top refused_to_assess + bottom ENDORSEMENT | PARTIAL | ENDORSEMENT lowest (1.14); refused_to_assess not highest (0–7% vs Gemini 0–19%) |
+| P4 | ChatGPT least stale of the four | HIT (tied) | ~0–4% combined, tied with Perplexity |
+| P5 | hallucinated_verification ≥25% on F3 | MISS | overall band 0–10%, one judge only |
+| P6 | conflated_identity <5% | HIT | 0–2% |
+| P7 | Tag instability >30% | HIT | 86% of prompt-cells |
+| P8 | Knowledge mode ≥75% blank | NOT TESTABLE | not broken out this wave |
+| P9 | Cross-family agreement 60–75% | MISS | 35% (117/332) |
+| P10 | Claude self-preference ≥10pt | INCONCLUSIVE | Claude-answer agreement 22% is below the others' mean (~40%) but above Perplexity (13%) — tracks junk load, not model family; this design can't separate the two |
+| P11 | Site >60% by W2; Perplexity fastest, Gemini slowest | HIT | 180/252 (71%); Perplexity +50, Gemini +2 |
+
+**Scorecard: 4 HIT (1 tied) · 1 PARTIAL · 1 INCONCLUSIVE · 3 MISS · 2 NOT TESTABLE.** P9 is load-bearing: 35% sits well under the pre-declared 60% floor, so by the protocol's own rule the taxonomy is underspecified — hence bands for nine of eleven categories. P1 and P5 miss in the same direction: both assumed the world was worse than it was, so creating more surface mattered less than fixing the judge. P11 holds in aggregate only because Perplexity and Gemini carried it — Claude cited the site on zero probes in both waves, the finding this scorecard had no line for.

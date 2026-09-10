@@ -1,5 +1,4 @@
 # mirror-eval
-By **[Zoeb Nomi](https://zoebnomi.com/?utm_source=github&utm_medium=readme&utm_campaign=mirror-eval)** — AI Product Manager (LLM/RAG output quality & evaluation). Companion project: [CrossSource](https://github.com/zoeb-nomi/crosssource).
 
 **An evaluation harness for what AI search engines say about a person — and whether you can change it.**
 
@@ -16,7 +15,41 @@ numbers cannot support.
 
 ---
 
-## Status — 2026-08-06
+## Status — 2026-09-04
+
+Wave 2 (lift) ran 2026-09-04, a month after the 2026-08-06 baseline, on the identical battery v1, canon, and composition: 332 probes per wave (83/engine × 4; 63 search-mode + 20 knowledge-mode). Both waves are now judged by the same config — `claude-haiku-4-5-20251001` + `gemini-3.8-flash` — because wave 1 was re-judged with it; its judge snapshots were never recorded, so re-judging was the only way to make the waves comparable.
+
+**The judge-free headline — probes citing each source, of 63 search-mode probes per engine, W1 → W2:**
+
+| Engine | Site | Repo | Owned (site or repo) |
+|---|---|---|---|
+| ChatGPT | 62→54 | 0→25 | 62→63 |
+| Claude | 0→0 | 0→0 | 0→0 |
+| Perplexity | 13→63 | 0→0 | 13→63 |
+| Gemini | 61→63 | 0→32 | 61→63 |
+
+Three engines now cite something we own on nearly every search probe. Claude does not, in either wave — the split worth naming. Perplexity went from barely finding the site (13/63) to every probe (63/63); Claude found it on zero probes both months. The junk that poisoned Claude's citations mostly cleared — weekday.works 8→0, hamariweb 22→0, kabalarians 22→0 (four poisoned sources, 79→11 combined) — but nothing we control filled the vacuum. ZoomInfo did: 0→74. Removing bad sources worked as intended and still left this engine no better off, because nothing citable replaced them.
+
+The one number stated as fact, not a band: `poisoned_citation` — computed against `canon.yaml`, not judged — fell **27% → 19%**. Both judges' tags on it are byte-identical, the only reason it's a point estimate.
+
+Everything else is a band. Only two of eleven categories separated: `stale_positioning` (18–35%→1–15%) and `fabricated_metric` (9–19%→1–8%). Every other category still overlaps its baseline band and isn't a result, whatever the midpoint suggests. Cross-family judge agreement on exact tag-set: **117/332 (35%)**. A third blind human-labelled check puts the Claude judge at **3/40 (8%)** exact match to a human, the Gemini judge at **12/40 (30%)**. Re-asking identical prompts moves the tag set on **86% of prompt-cells** — unstable against its own re-ask, not just under-agreed between judges.
+
+*(The 8%→17% figures in the August 6 status below predate the shared judge config and blind validation; superseded by the numbers above.)*
+
+**Limitations**
+
+- **Engine versions aren't verifiably frozen.** Gemini resolved to `gemini-3.8-flash` in wave 2; wave 1's snapshot was never recorded. The citation trail is index-driven and robust to that; the model-driven taxonomy is not.
+- **~2 weeks of recrawl, not 4.** The last fixes (topmate rewrite, new `/writing/` page) landed Aug 17–20; wave 2 ran Sep 4.
+- **Interventions were a cluster, not isolated tests.** Six changes went out Aug 7–20; the lift is attributable to the cluster, not any one fix.
+- **Human validation is 40 of 227 eligible items**, stratified (16 disagreements, 12 high-impact, 12 controls) — not a full audit. Tags are published in `results/2026-09-04/human_labels.yaml`; the labeller's free-text notes and the verbatim answers are withheld and available on request.
+- **Re-judged wave-1 scores cover 654 of 664 judgements.** The Gemini judge returned unparseable JSON on 10 rows; they are excluded rather than back-filled.
+- **Wave 1 has no `manifest.json`** — it predates the manifest convention; wave 2's records the frozen-file hashes.
+- **Canon has a coverage gap.** Several `fabricated_metric` spans were true, published numbers missing from `canon.yaml` — inflating that category and `unverifiable_specific` alike.
+- **Per-probe data may reference third parties.** Cited surfaces in `scores.jsonl` can include other people's public posts; verbatim engine answers are not published for that reason.
+
+Mirror-eval v1 closes with this wave. No full wave 3; a Claude-only mini-wave — the one engine still unsolved — is under consideration. No new predictions were made for wave 2; [`PREDICTIONS.md`](PREDICTIONS.md) carries the full scorecard.
+
+## Status — 2026-08-06 (superseded — see above)
 
 **Wave 1 is complete: 332 probes across ChatGPT, Claude, Perplexity and Gemini.**
 Results are not published yet, and the reason is the honest one.
