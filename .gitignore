@@ -26,3 +26,7 @@ Mirror Eval Labeler/
 !results/*/scores.jsonl
 !results/*/manifest.json
 !results/*/human_labels.yaml
+
+
+# v2 dossier harness — run outputs stay local
+v2/dossier/results/*/
