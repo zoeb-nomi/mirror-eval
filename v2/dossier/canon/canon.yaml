@@ -1,0 +1,177 @@
+# CANON — the answer key mirror-eval v2 "Prompt B" scores against.
+#
+# Restructured from mirror-eval/canon.yaml (studied read-only in STEP 0 of this
+# build; see ../INFRA_NOTES.md) into field-level records so each fact can carry
+# its own truth/claim status instead of one blanket "verified_claims" list.
+#
+# RULE (see canon/README.md for the full explanation):
+#   truth: true   requires a verifying_url that is NOT zoebnomi.com and NOT a
+#                 github.com/zoeb-nomi path — i.e. a page Zoeb does not own or
+#                 author, where a third party independently states the fact.
+#   truth: false  ("claim") is everything else, including self-published pages
+#                 (his own site, his own GitHub, his own LinkedIn copy).
+#
+# A field's `value` is what a model must say to be scored ACCURATE on that
+# field. `stale_or_false` below lists specific wrong answers to watch for even
+# though they aren't tied to one field (metrics.py flags any of these as a
+# hard miss regardless of which field the claim maps to).
+#
+# SCOPE: ships in a PUBLIC repo. Résumé-level facts + CrossSource's published
+# numbers only. No Instead-confidential internals (corpus sizes, client names,
+# competitor benchmarks) — same rule mirror-eval used, kept here unchanged.
+#
+# !! ZOEB: every `claim` field below with a `# TODO(zoeb)` comment is one where
+# a real third-party URL plausibly exists (a Keka blog post, an Instead
+# announcement) but this build does not have the confirmed link on file. Paste
+# the exact URL and flip truth: true yourself — this harness will not guess
+# one for you.
+
+entity: "Zoeb Nomi"
+role_noun: "product manager"
+flagship_artifact: "CrossSource"
+
+fields:
+  - id: current_title
+    text: "Currently Product Manager at Instead"
+    truth: false
+    verifying_url: null
+    note: "Self-asserted (resume, LinkedIn, zoebnomi.com). No independent URL on file."
+
+  - id: current_company
+    text: "Instead is an AI-native tax research and planning platform, and one of the few new IRS e-filing approved software providers"
+    truth: true
+    verifying_url: "https://rocketreach.co/zoeb-nomi-email_380343494"
+    # Two-token rule (see canon/README.md "Match rules"). Score 1 only if BOTH:
+    #   match_all: every token must appear, AND
+    #   match_any: at least one token must appear.
+    # Token starting with a capital letter -> case-SENSITIVE, \b word-boundary
+    #   match ("Instead" hits "at Instead (" but not "instead of").
+    # Any other token -> case-insensitive substring ("instead.com", "tax").
+    # This stops the ordinary English word "instead" from scoring as the company.
+    # Only truth fields are scored (metrics.py field_accuracy()); claim fields
+    # are reported as claims, never scored right/wrong.
+    match_all: ["Instead"]
+    match_any: ["instead.com", "tax", "Instead Inc", "Instead, a"]
+    note: >
+      Reused from mirror-eval's canon.yaml clean_sources, where it is already
+      flagged "self-corrected; now accurate" — the one non-owned source that
+      repo vetted. Not zoebnomi.com, not github.com/zoeb-nomi.
+
+  - id: current_since
+    text: "At Instead since September 2025"
+    truth: false
+    verifying_url: null   # TODO(zoeb): LinkedIn start-date badge, or an Instead announcement, if either is public
+
+  - id: wedge
+    text: "Wedge is eval-driven LLM/RAG output quality"
+    truth: false
+    verifying_url: null
+    note: "Positioning language, not a third-party-checkable fact."
+
+  - id: location
+    text: "Based in Bengaluru, India; open to US relocation"
+    truth: false
+    verifying_url: null
+
+  - id: seniority_target
+    text: "Targeting mid-level AI Product Manager roles"
+    truth: false
+    verifying_url: null
+    note: "A stated goal, not a fact a third party can confirm."
+
+  - id: crosssource_repo
+    text: "CrossSource is his open-source LLM/RAG evaluation harness for citation reliability on public case law"
+    truth: false
+    verifying_url: null   # TODO(zoeb): the github.com/zoeb-nomi/crosssource repo is his own — doesn't qualify. A HN/blog mention that links it would.
+
+  - id: crosssource_precision
+    text: "CrossSource citation precision improved from 0.981 to 0.994 under strict configuration"
+    truth: false
+    verifying_url: null
+    note: "Lives in his own repo/README today. Not independently hosted yet."
+
+  - id: crosssource_agreement
+    text: "CrossSource reported 100% human-judge agreement on a blind stratified sample (15/15)"
+    truth: false
+    verifying_url: null
+
+  - id: crosssource_production_accuracy
+    text: "Sustains ~95% citation accuracy on the benchmark eval set in production"
+    truth: false
+    verifying_url: null
+
+  - id: keka_bgv
+    text: "Built a Background Verification module zero-to-one at Keka HR reaching $2.7M MRR"
+    truth: false
+    verifying_url: null   # TODO(zoeb): the Keka Product Medium profile piece ("The Rabbit-Hole Explorer...", Jan 2025) or a Keka BGV announcement/video, if it states the number
+
+  - id: keka_us_expansion
+    text: "Drove Keka's first US-market expansion, onboarding 28 US enterprise clients"
+    truth: false
+    verifying_url: null
+
+  - id: keka_exit_module
+    text: "Reduced offboarding time 28% at Keka via an Exit Module revamp"
+    truth: false
+    verifying_url: null   # TODO(zoeb): Keka's public Exit Module announcement/video, if it states the number
+
+  - id: multiplier_results
+    text: "Delivered $100K incremental revenue and a 47% operational-efficiency gain at Multiplier"
+    truth: false
+    verifying_url: null
+
+  - id: career_arc
+    text: "Mechanical engineer by training; career arc Hurix -> Keka -> Multiplier -> Instead"
+    truth: false
+    verifying_url: null
+
+  - id: keka_profile_piece
+    text: "Keka published a profile piece on him on its Keka Product Medium blog (\"Meet Zoeb Nomi: The Rabbit-Hole Explorer and CoreHR Maestro\", Jan 2025)"
+    truth: false
+    verifying_url: null   # TODO(zoeb): paste the exact medium.com URL — this one is almost certainly a real truth: true field once linked; Keka authored it, not Zoeb
+
+# CIRCULATING BUT WRONG. Asserting any of these as CURRENT fact = accuracy 0
+# on whichever field it contradicts. Carried over verbatim from mirror-eval.
+stale_or_false:
+  - "Senior Product Manager"
+  - "Lead Product Manager"
+  - "Associate Product Manager"
+  - "cultural technology"
+  - "cultural products"
+  - "85% <any metric>"
+  - "currently at Keka"
+  - "currently at Multiplier"
+  - "currently at Hurix"
+  - "primarily an HR-tech product manager"
+  - "primarily an HR-tech generalist"
+  - "works at Weekday"
+  - "based in the United States"
+
+# Sources known to carry wrong or conflated information about him.
+poisoned_sources:
+  - "portfolio-a5z.pages.dev"
+  - "weekday.works"
+  - "naukri.com"
+  - "kabalarians.com"
+  - "hamariweb.com"
+  - "peekyou.com"
+  - "any Keka-era press or job listing"
+
+# Owned surfaces — his own domains/repos. Never count as a `truth` verifying_url,
+# but DO count for metrics.py's owned-surface retrieval-hit-rate metric.
+owned_sources:
+  - "zoebnomi.com"
+  - "github.com/zoeb-nomi"
+
+# Zoeb-authored but not Zoeb-owned-domain (his LinkedIn copy). Treated as
+# self-published for the truth/claim rule, same as owned_sources, but kept
+# separate because it is a distinct domain for provenance/metrics purposes.
+self_published_sources:
+  - "linkedin.com/in/zoebnomi"
+
+# Real pages that are simply NOT ABOUT HIM. Building claims on these is the
+# `substituted_source` failure mode.
+irrelevant_source_patterns:
+  - "job boards (lever.co, jobright.ai, lazyapply.com, himalayas.app, wellfound.com, web3.career)"
+  - "generic LLM-evaluation literature (arxiv.org, confident-ai.com, evidentlyai.com, productschool.com)"
+  - "encyclopaedia and name-meaning pages (wikipedia.org, kabalarians.com, hamariweb.com)"

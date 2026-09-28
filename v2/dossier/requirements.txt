@@ -1,0 +1,7 @@
+# Pinned to what this build installed and tested against. Python 3.11 stdlib
+# covers everything else (argparse, json, pathlib, concurrent.futures,
+# threading, re, hashlib, urllib.parse, dataclasses, datetime).
+anthropic==1.8.0
+openai==3.19.2
+PyYAML==6.0.3
+pytest==9.1.1

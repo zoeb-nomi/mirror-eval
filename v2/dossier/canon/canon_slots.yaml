@@ -1,0 +1,13 @@
+# CANON SLOTS — the fixed values used to fill sourcing_query placeholders
+# (prompts/build_prompts.py, SOURCING task) and to render {{slot}} templates
+# elsewhere in the harness. Four slots only, deliberately: these are the
+# facts a real sourcer would already have about a role before writing a
+# Boolean string, not a restatement of the whole dossier.
+#
+# Changing a value here changes every future SOURCING prompt. Do it
+# consciously and re-run `make prompts`.
+
+title: "AI Product Manager"
+skills: "LLM evaluation, RAG quality"
+location: "Bengaluru, open to US relocation"
+seniority: "mid-level"
